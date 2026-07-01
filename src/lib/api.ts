@@ -5,27 +5,13 @@ import type {
   TripScheduleEntry,
   StopEntry,
   RouteShapeEntry,
+  VehiclesData,
 } from './types'
 
 const OBA_KEY = 'TEST'
 const API = 'https://api.pugetsound.onebusaway.org/api/where'
 const AGENCY = '40'
 
-const ROUTE_COLORS: Record<string, string> = {
-  '40_510': '#2B376E', '40_512': '#2B376E', '40_513': '#2B376E', '40_515': '#2B376E',
-  '40_100232': '#2B376E', '40_532': '#2B376E', '40_535': '#2B376E',
-  '40_100511': '#2B376E', '40_100236': '#2B376E', '40_100239': '#2B376E',
-  '40_100240': '#2B376E', '40_100451': '#2B376E', '40_560': '#2B376E',
-  '40_102734': '#2B376E', '40_102758': '#2B376E', '40_574': '#2B376E',
-  '40_577': '#2B376E', '40_578': '#2B376E', '40_580': '#2B376E',
-  '40_586': '#2B376E', '40_590': '#2B376E', '40_592': '#2B376E',
-  '40_594': '#2B376E', '40_595': '#2B376E', '40_596': '#2B376E',
-  '40_100479': '#28813F', '40_2LINE': '#00A0DF', '40_TLINE': '#F38B00',
-  '40_EV': '#9AB6D3', '40_TL': '#9AB6D3',
-}
-export function routeColor(routeId: string): string {
-  return ROUTE_COLORS[routeId] || '#677483'
-}
 
 async function fetchOba<T>(path: string): Promise<T> {
   const url = `${API}${path}${path.includes('?') ? '&' : '?'}key=${OBA_KEY}`
@@ -67,10 +53,10 @@ export async function fetchTripIdsForRoute(routeId: string): Promise<Set<string>
   } catch { return new Set() }
 }
 
-// ── All vehicles for agency ──
-export async function fetchAllVehicles(): Promise<VehicleEntry[]> {
-  const data = await fetchOba<{ list: VehicleEntry[] }>(`/vehicles-for-agency/${AGENCY}.json`)
-  return data.list
+// ── All vehicles for agency (includes route info in references) ──
+export async function fetchAllVehicles(): Promise<VehiclesData> {
+  const data = await fetchOba<VehiclesData>(`/vehicles-for-agency/${AGENCY}.json`)
+  return data
 }
 
 // ── Trip details with stop times ──

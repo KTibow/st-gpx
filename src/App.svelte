@@ -3,10 +3,11 @@
   import { now } from './lib/now.svelte'
   import { fetchAllVehicles } from './lib/api'
   import { generateGpx } from './lib/gpx'
-  import type { VehicleEntry, TrackPoint } from './lib/types'
+  import type { VehicleEntry, TrackPoint, VehicleReferences } from './lib/types'
 
   // ── State ──
   let vehicles = $state<VehicleEntry[]>([])
+  let refs = $state<VehicleReferences>({ trips: [], routes: [] })
   let selectedVehicleId = $state('')
   let trackPoints = $state<TrackPoint[]>([])
   let isTracking = $state(false)
@@ -21,9 +22,46 @@
 
   async function refreshVehicles() {
     try {
-      vehicles = await fetchAllVehicles()
+      const data = await fetchAllVehicles()
+      vehicles = data.list
+      refs = data.references
       lastRefresh = Date.now()
     } catch (e) { console.error(e) }
+  }
+
+  // ── Lookups from references ──
+  let tripRouteMap = $derived.by(() => {
+    const m = new Map<string, string>()
+    for (const t of refs.trips) {
+      if (t.id && t.routeId) m.set(t.id, t.routeId)
+    }
+    return m
+  })
+  let routeInfoMap = $derived.by(() => {
+    const m = new Map<string, { shortName: string; longName: string; color?: string; textColor?: string }>()
+    for (const r of refs.routes) {
+      if (r.id) m.set(r.id, { shortName: r.shortName, longName: r.longName, color: r.color, textColor: r.textColor })
+    }
+    return m
+  })
+
+  function vehicleRouteName(v: VehicleEntry): string {
+    if (!v.tripId) return ''
+    const routeId = tripRouteMap.get(v.tripId)
+    if (!routeId) return ''
+    const info = routeInfoMap.get(routeId)
+    return info?.shortName || info?.longName || routeId
+  }
+
+  function vehicleRouteStyle(v: VehicleEntry): string {
+    if (!v.tripId) return ''
+    const routeId = tripRouteMap.get(v.tripId)
+    if (!routeId) return ''
+    const info = routeInfoMap.get(routeId)
+    if (!info?.color) return ''
+    const bg = `#${info.color}`
+    const fg = info.textColor ? `#${info.textColor}` : '#ffffff'
+    return `background:${bg};color:${fg}`
   }
 
   // ── Derived ──
@@ -58,8 +96,8 @@
 
   async function pollOnce() {
     try {
-      const all = await fetchAllVehicles()
-      const v = all.find(x => x.vehicleId === selectedVehicleId)
+      const data = await fetchAllVehicles()
+      const v = data.list.find(x => x.vehicleId === selectedVehicleId)
       if (!v) return
 
       const pos = v.location || v.tripStatus?.position
@@ -192,11 +230,13 @@
           {@const dev = v.tripStatus?.scheduleDeviation}
           <button
             class="v-card"
-            class:selected={selectedVehicleId === v.vehicleId}
-            onclick={() => { selectedVehicleId = v.vehicleId }}
+            onclick={() => { selectedVehicleId = v.vehicleId; startTracking(); }}
           >
             <div class="v-head">
               <span class="v-id mono">{v.vehicleId}</span>
+              {#if vehicleRouteName(v)}
+                <span class="v-route" style={vehicleRouteStyle(v)}>{vehicleRouteName(v)}</span>
+              {/if}
               <span class="v-age mono">{ageStr(ts)}</span>
             </div>
             <div class="v-sub">
@@ -215,13 +255,7 @@
         {/each}
       </div>
 
-      {#if selectedVehicleId}
-        <div class="panel-foot">
-          <button class="btn-primary" onclick={startTracking}>
-            ▶ Track {selectedVehicleId}
-          </button>
-        </div>
-      {/if}
+
     {/if}
   </div>
 
@@ -249,7 +283,7 @@
     {:else}
       <div class="map-placeholder">
         <div class="empty-icon">🚍</div>
-        <p class="label-sm">{vehicles.length} vehicles · tap one to track</p>
+        <p class="label-sm">{vehicles.length} vehicles · {refs.routes.length} routes · tap one to track</p>
       </div>
     {/if}
   </div>
@@ -326,9 +360,9 @@
     transition: all 0.1s;
   }
   .v-card:hover { background: var(--m3c-surface-container-high); }
-  .v-card.selected { background: var(--m3c-primary-container-subtle); border-color: var(--m3c-primary); }
   .v-head { display: flex; align-items: center; gap: 6px; }
   .v-id { font-size: 13px; font-weight: 600; }
+  .v-route { font-size: 11px; font-weight: 600; padding: 0 5px; border-radius: 3px; background: color-mix(in srgb, currentColor 12%, transparent); }
   .v-age { font-size: 10px; color: var(--m3c-on-surface-variant); opacity: 0.7; margin-left: auto; }
   .v-sub { display: flex; gap: 8px; align-items: center; font-size: 10px; }
   .v-pos { color: var(--m3c-on-surface-variant); }
@@ -342,12 +376,6 @@
     color: var(--m3c-on-surface-variant);
     font-size: 12px;
     opacity: 0.6;
-  }
-
-  /* Panel foot */
-  .panel-foot {
-    padding: 8px 12px;
-    border-top: 1px solid var(--m3c-outline-variant);
   }
 
   /* Buttons */

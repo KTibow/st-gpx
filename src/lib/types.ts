@@ -79,6 +79,39 @@ export interface RouteShapeEntry {
   }>
 }
 
+export interface TripRefEntry {
+  id: string
+  routeId: string
+  blockId?: string
+  tripHeadsign?: string
+  directionId?: string
+  serviceId?: string
+  shapeId?: string
+}
+
+export interface RouteRefEntry {
+  id: string
+  shortName: string
+  longName: string
+  description?: string
+  agencyId?: string
+  color?: string
+  textColor?: string
+  type?: number
+}
+
+export interface VehicleReferences {
+  trips: TripRefEntry[]
+  routes: RouteRefEntry[]
+  stops?: StopEntry[]
+  agencies?: Array<{ id: string; name: string }>
+}
+
+export interface VehiclesData {
+  list: VehicleEntry[]
+  references: VehicleReferences
+}
+
 export interface TrackPoint {
   lat: number
   lon: number
