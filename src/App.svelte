@@ -34,7 +34,7 @@
       if (!age) return false
       // Only show vehicles updated in the last 10 minutes
       return (Date.now() - age) < 600000
-    }).sort((a, b) => a.vehicleId.localeCompare(b.vehicleId))
+    }).sort((a, b) => a.vehicleId.localeCompare(b.vehicleId, undefined, { numeric: true }))
   )
 
   let selectedVehicle = $derived(vehicles.find(v => v.vehicleId === selectedVehicleId) || null)
@@ -134,10 +134,6 @@
     return `${Math.floor(sec / 60)}m ${sec % 60}s ago`
   }
 
-  function shortId(id: string): string {
-    return id.length > 4 ? id.slice(-4) : id
-  }
-
   function formatTime(ts: number): string {
     return new Date(ts).toLocaleTimeString()
   }
@@ -156,7 +152,7 @@
       <!-- Tracking view -->
       <div class="tracking-view">
         <div class="track-head">
-          <span class="track-badge">● #{shortId(selectedVehicleId)}</span>
+          <span class="track-badge">● {selectedVehicleId}</span>
           <span class="track-stats">
             <span class="mono">{trackCount}</span> pts ·
             <span class="mono">{trackCount > 1 ? ((trackPoints[trackPoints.length-1].time - trackPoints[0].time)/60000).toFixed(1) : '—'}</span> min
@@ -200,7 +196,7 @@
             onclick={() => { selectedVehicleId = v.vehicleId }}
           >
             <div class="v-head">
-              <span class="v-id mono">#{shortId(v.vehicleId)}</span>
+              <span class="v-id mono">{v.vehicleId}</span>
               <span class="v-age mono">{ageStr(ts)}</span>
             </div>
             <div class="v-sub">
@@ -222,7 +218,7 @@
       {#if selectedVehicleId}
         <div class="panel-foot">
           <button class="btn-primary" onclick={startTracking}>
-            ▶ Track #{shortId(selectedVehicleId)}
+            ▶ Track {selectedVehicleId}
           </button>
         </div>
       {/if}
