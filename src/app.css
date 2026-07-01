@@ -1,0 +1,79 @@
+@import url('https://fonts.googleapis.com/css2?family=Google+Sans+Flex:wght@300;400;500;600;700&display=swap');
+
+@layer tokens {
+  :root {
+    color-scheme: light dark;
+    --m3c-surface: light-dark(#fbf8ff, #0d0e14);
+    --m3c-surface-container-lowest: light-dark(#fff, #000);
+    --m3c-surface-container-low: light-dark(#f3f2ff, #11131c);
+    --m3c-surface-container: light-dark(#ededfb, #171923);
+    --m3c-surface-container-high: light-dark(#e7e7f7, #1d1f2a);
+    --m3c-surface-container-highest: light-dark(#e1e1f4, #232532);
+    --m3c-on-surface: light-dark(#2f3240, #e3e4f7);
+    --m3c-on-surface-variant: light-dark(#5c5e6e, #a9aabb);
+    --m3c-outline: light-dark(#787a8a, #737484);
+    --m3c-outline-variant: light-dark(#b0b1c2, #454756);
+    --m3c-inverse-surface: light-dark(#0b0d1a, #fbf8ff);
+    --m3c-inverse-on-surface: light-dark(#9d9ca5, #54545c);
+    --m3c-primary: light-dark(#2b376e, #8f9ad8);
+    --m3c-on-primary: light-dark(#b0bbfb, #0d1a52);
+    --m3c-primary-container: #37437b;
+    --m3c-on-primary-container: #c6ceff;
+    --m3c-inverse-primary: light-dark(#acb8f8, #505b95);
+    --m3c-secondary: light-dark(#5a5e76, #999cb7);
+    --m3c-on-secondary: light-dark(#faf8ff, #1b1f34);
+    --m3c-secondary-container: light-dark(#d8dbf8, #2b2f45);
+    --m3c-on-secondary-container: light-dark(#494d65, #abafca);
+    --m3c-tertiary: light-dark(#006a6a, #48adab);
+    --m3c-on-tertiary: light-dark(#e0fffd, #002525);
+    --m3c-tertiary-container: #008281;
+    --m3c-on-tertiary-container: #fff;
+    --m3c-error: light-dark(#9f3f47, #fa868d);
+    --m3c-on-error: light-dark(#fff7f6, #580817);
+    --m3c-error-container: light-dark(#fa868d, #4c000f);
+    --m3c-on-error-container: light-dark(#580817, #ef7e84);
+    --m3c-shadow: #000;
+    --m3c-scrim: #000;
+    --m3c-primary-container-subtle: light-dark(#d2d8ff, #1b275e);
+    --m3c-on-primary-container-subtle: light-dark(#3d4981, #9ca8e6);
+    --m3c-secondary-container-subtle: light-dark(#d5d8f5, #272b41);
+    --m3c-on-secondary-container-subtle: light-dark(#474b63, #a6a9c5);
+    --m3c-tertiary-container-subtle: light-dark(#89eae8, #003232);
+    --m3c-on-tertiary-container-subtle: light-dark(#005655, #58bab9);
+    --m3c-error-container-subtle: light-dark(#ffcecf, #5b0b18);
+    --m3c-on-error-container-subtle: light-dark(#872d36, #fd898f);
+  }
+}
+
+:root {
+  font-family: 'Google Sans Flex', system-ui, -apple-system, sans-serif;
+  background: var(--m3c-surface);
+  color: var(--m3c-on-surface);
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-size: 14px;
+  line-height: 1.4;
+  background: var(--m3c-surface);
+  color: var(--m3c-on-surface);
+}
+
+/* Utility classes */
+.mono {
+  font-family: 'Google Sans Flex', 'SF Mono', ui-monospace, monospace;
+  font-variant-numeric: tabular-nums;
+}
+
+.label-sm {
+  font-size: 10px;
+  letter-spacing: 0.04em;
+  color: var(--m3c-on-surface-variant);
+  font-weight: 500;
+  text-transform: uppercase;
+}
