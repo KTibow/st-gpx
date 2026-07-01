@@ -4,15 +4,6 @@ export interface ObaResponse<T> {
   data: T
 }
 
-export interface RouteEntry {
-  id: string
-  shortName: string
-  longName: string
-  description: string
-  agencyId: string
-  color?: string
-}
-
 export interface VehicleEntry {
   vehicleId: string
   tripId: string
@@ -39,25 +30,7 @@ export interface VehicleEntry {
   }
 }
 
-export interface TripScheduleEntry {
-  tripId: string
-  serviceDate: number
-  status: string
-  schedule: {
-    nextTripId: string
-    previousTripId: string
-    stopTimes: Array<{
-      arrivalTime: number
-      departureTime: number
-      stopId: string
-      stopHeadsign: string
-      distanceAlongTrip: number
-    }>
-    timeZone: string
-  }
-}
-
-export interface StopEntry {
+interface StopEntry {
   id: string
   name: string
   lat: number
@@ -67,19 +40,7 @@ export interface StopEntry {
   routeIds: string[]
 }
 
-export interface RouteShapeEntry {
-  stopIds: string[]
-  polylines: Array<{ points: string }>
-  stopGroupings: Array<{
-    type: string
-    stopGroups: Array<{
-      name: { name: string; names: string[]; type: string }
-      stopIds: string[]
-    }>
-  }>
-}
-
-export interface TripRefEntry {
+interface TripRefEntry {
   id: string
   routeId: string
   blockId?: string
@@ -89,7 +50,7 @@ export interface TripRefEntry {
   shapeId?: string
 }
 
-export interface RouteRefEntry {
+interface RouteRefEntry {
   id: string
   shortName: string
   longName: string
