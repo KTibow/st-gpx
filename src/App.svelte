@@ -177,9 +177,8 @@
   }
 </script>
 
-<div id="shell">
-  <!-- Left panel -->
-  <div id="panel">
+<!-- Left panel -->
+<div id="panel">
     <div class="panel-header">
       <span class="panel-title">ST GPX</span>
       <span class="panel-count label-sm">{activeVehicles.length} active</span>
@@ -259,8 +258,8 @@
     {/if}
   </div>
 
-  <!-- Map preview -->
-  <div id="map">
+<!-- Map preview -->
+<div id="map">
     {#if trackPoints.length > 1}
       <svg class="route-svg" viewBox="0 0 400 600" preserveAspectRatio="xMidYMid meet">
         <polyline
@@ -287,25 +286,37 @@
       </div>
     {/if}
   </div>
-</div>
 
 <style>
-  #shell { display: flex; height: 100dvh; }
+  :global(body) {
+    display: grid;
+    grid-template-columns: 380px 1fr;
+    height: 100dvh;
+    margin: 0;
+  }
+
   #panel {
-    width: 380px;
-    min-width: 380px;
     display: flex;
     flex-direction: column;
     background: var(--m3c-surface-container-low);
     border-right: 1px solid var(--m3c-outline-variant);
+    overflow: hidden;
   }
   #map {
-    flex: 1;
     display: flex;
     align-items: center;
     justify-content: center;
     background: var(--m3c-surface);
     overflow: hidden;
+  }
+
+  @media (max-width: 768px) {
+    :global(body) {
+      grid-template-columns: 1fr;
+    }
+    #map {
+      display: none;
+    }
   }
 
   /* Panel header */
@@ -473,7 +484,6 @@
     padding: 2px 0;
   }
 
-  /* Map */
   .route-svg { width: 100%; height: 100%; }
   .map-placeholder {
     display: flex;
