@@ -44,6 +44,13 @@
     }
     return m
   })
+  let tripHeadsignMap = $derived.by(() => {
+    const m = new Map<string, string>()
+    for (const t of refs.trips) {
+      if (t.id && t.tripHeadsign) m.set(t.id, t.tripHeadsign)
+    }
+    return m
+  })
 
   function vehicleRouteName(v: VehicleEntry): string {
     if (!v.tripId) return ''
@@ -62,6 +69,15 @@
     const bg = `#${info.color}`
     const fg = info.textColor ? `#${info.textColor}` : '#ffffff'
     return `background:${bg};color:${fg}`
+  }
+  function vehicleHeadsign(v: VehicleEntry): string {
+    if (!v.tripId) return ''
+    return tripHeadsignMap.get(v.tripId) || ''
+  }
+  function vehicleProgress(v: VehicleEntry): number | null {
+    const ts = v.tripStatus
+    if (!ts || !ts.totalDistanceAlongTrip) return null
+    return Math.round((ts.distanceAlongTrip / ts.totalDistanceAlongTrip) * 100)
   }
 
   // ── Derived ──
@@ -227,6 +243,8 @@
           {@const pos = v.location || v.tripStatus?.position}
           {@const ts = v.tripStatus?.lastUpdateTime || v.lastUpdateTime}
           {@const dev = v.tripStatus?.scheduleDeviation}
+          {@const hs = vehicleHeadsign(v)}
+          {@const prog = vehicleProgress(v)}
           <button
             class="v-card"
             onclick={() => { selectedVehicleId = v.vehicleId; startTracking(); }}
@@ -236,11 +254,17 @@
               {#if vehicleRouteName(v)}
                 <span class="v-route" style={vehicleRouteStyle(v)}>{vehicleRouteName(v)}</span>
               {/if}
+              {#if hs}
+                <span class="v-dest">→ {hs}</span>
+              {/if}
               <span class="v-age mono">{ageStr(ts)}</span>
             </div>
             <div class="v-sub">
               {#if pos}
                 <span class="v-pos mono">{pos.lat.toFixed(4)}, {pos.lon.toFixed(4)}</span>
+              {/if}
+              {#if prog != null}
+                <span class="v-prog">{prog}%</span>
               {/if}
               {#if dev != null}
                 <span class="v-dev mono" class:late={dev > 30} class:early={dev < -30}>
@@ -374,9 +398,11 @@
   .v-head { display: flex; align-items: center; gap: 6px; }
   .v-id { font-size: 13px; font-weight: 600; }
   .v-route { font-size: 11px; font-weight: 600; padding: 0 5px; border-radius: 3px; background: color-mix(in srgb, currentColor 12%, transparent); }
+  .v-dest { font-size: 10px; color: var(--m3c-secondary); font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 140px; }
   .v-age { font-size: 10px; color: var(--m3c-on-surface-variant); opacity: 0.7; margin-left: auto; }
   .v-sub { display: flex; gap: 8px; align-items: center; font-size: 10px; }
   .v-pos { color: var(--m3c-on-surface-variant); }
+  .v-prog { font-size: 10px; font-weight: 700; color: var(--m3c-primary); }
   .v-dev { font-weight: 600; }
   .v-dev.late { color: var(--m3c-error); }
   .v-dev.early { color: var(--m3c-tertiary); }
